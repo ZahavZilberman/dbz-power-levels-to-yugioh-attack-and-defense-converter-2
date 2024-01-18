@@ -322,7 +322,7 @@ static CharacterOrMonster CalculatingSpecificCharacterATKPoints(List<Deck> AllDe
     double GapBetweenThisMonsterAndWeakestMonsterInPowerLevel = CurrentCharacter.PowerLevel / TheMonstersDeck.TheMonsterWithTheLowestPowerLevel.PowerLevel;
     double GapConvertedToATK = Math.Pow(GapBetweenThisMonsterAndWeakestMonsterInPowerLevel, TheMonstersDeck.ThePowerConvertorBetweenPowerLevelToATKPoints);
     double LogDifferenceBetweenCurrentMonsterAndStrongestMonster = Math.Log(TheMonstersDeck.TheHighestAllowedATKPoints) / Math.Log(GapConvertedToATK);
-    double TheAttackPoints = Math.Round(5000 / LogDifferenceBetweenCurrentMonsterAndStrongestMonster);
+    double TheAttackPoints = Math.Round(TheMonstersDeck.TheHighestAllowedATKPoints / LogDifferenceBetweenCurrentMonsterAndStrongestMonster);
     CurrentCharacter.ATKPoints = TheAttackPoints;
     CurrentCharacter.TheDeckThisGuyBelongsTo = TheMonstersDeck;
 
@@ -417,6 +417,7 @@ static void ShowingAllInfo(List<Deck> AllDecksToShow)
         Console.WriteLine();
         double currentStarMinimum = Math.Round((star - 1) * GapBetweenEachStar);
         double currentStarMaximum = Math.Round((star) * GapBetweenEachStar);
+
         Console.WriteLine($@"{star} star: between {currentStarMinimum} to {currentStarMaximum}");
     }
     Console.WriteLine();
@@ -475,14 +476,17 @@ static void ShowingAllInfo(List<Deck> AllDecksToShow)
 
 #endregion
 
+#region Calculating DEF points
+
 static List<Deck> CalculatingSpecificCharacterDEFPoints(List<Deck> AllDecks)
 {
+    CharacterOrMonster CurrentCharacter = new CharacterOrMonster();
+
     Console.Clear();
     Console.WriteLine("\x1b[3J");
 
-    #region Choosing the monster's deck
+    #region Choosing the deck to edit
 
-    CharacterOrMonster CurrentCharacter = new CharacterOrMonster();
     Deck TheMonstersDeck = new Deck();
 
     Console.WriteLine("The following is a list of all decks in the converter's database. Enter the name of the deck your monster will belong to (doesn't matter if upper of lower letters):");
@@ -520,42 +524,46 @@ static List<Deck> CalculatingSpecificCharacterDEFPoints(List<Deck> AllDecks)
         }
     }
 
-    CurrentCharacter.TheDeckThisGuyBelongsTo = new Deck();
-    CurrentCharacter.TheDeckThisGuyBelongsTo = TheMonstersDeck;
+    
 
     #endregion
 
-    #region Choosing the existing monster to update its DEF points
-
+    bool DoesTheUserWantsToApplyTheGapToAllCharacters = false;
     Console.Clear();
     Console.WriteLine("\x1b[3J");
+    Console.WriteLine("Now, decide if you want the gap between ATK/DEF you're going to input will only apply for one character, or the entire deck.");
+    Console.WriteLine("Do you wish to apply the gap to the entire deck? Enter as an answer - yes or no (not case sensitive).");
+    string answer = Console.ReadLine();
+    while(answer.ToLower() != "yes" && answer.ToLower() != "no")
+    {
+        Console.WriteLine();
+        Console.WriteLine("Your answer isn't neither yes nor no. Answer yes or no again:");
+        answer = Console.ReadLine();
+    }
 
-    Console.WriteLine(@$"The following is a list of all characters/monsters in that already exist in the deck named {TheMonstersDeck.DeckName}. Enter the name of the one you want to edit its DEF points):");
-    Console.WriteLine();
-    foreach (CharacterOrMonster monster in TheMonstersDeck.CharacterList)
+    if (answer.ToLower() == "no")
     {
-        Console.WriteLine($"{monster.Name}");
+        #region Choosing the existing monster to update its DEF points
+
+        CurrentCharacter = new CharacterOrMonster();
+        CurrentCharacter.TheDeckThisGuyBelongsTo = new Deck();
+        CurrentCharacter.TheDeckThisGuyBelongsTo = TheMonstersDeck;
+        Console.Clear();
+        Console.WriteLine("\x1b[3J");
+
+        Console.WriteLine(@$"The following is a list of all characters/monsters in that already exist in the deck named {TheMonstersDeck.DeckName}. Enter the name of the one you want to edit its DEF points):");
         Console.WriteLine();
-    }
-    Console.WriteLine();
-    Console.WriteLine("So, what is the character's name (card name)?");
-    Console.WriteLine();
-    string NameForIt = Console.ReadLine();
-    Console.WriteLine();
-    bool HasTheMonsterBeenFound = false;
-    for (int i = 0; i < TheMonstersDeck.CharacterList.Count; i++)
-    {
-        if (TheMonstersDeck.CharacterList.ElementAt(i).Name.ToLower() == NameForIt.ToLower())
+        foreach (CharacterOrMonster monster in TheMonstersDeck.CharacterList)
         {
-            HasTheMonsterBeenFound = true;
+            Console.WriteLine($"{monster.Name}");
+            Console.WriteLine();
         }
-    }
-    while(!HasTheMonsterBeenFound)
-    {
         Console.WriteLine();
-        Console.WriteLine("This monster does not exist in this deck. Try another name:");
+        Console.WriteLine("So, what is the character's name (card name)?");
         Console.WriteLine();
-        NameForIt = Console.ReadLine();
+        string NameForIt = Console.ReadLine();
+        Console.WriteLine();
+        bool HasTheMonsterBeenFound = false;
         for (int i = 0; i < TheMonstersDeck.CharacterList.Count; i++)
         {
             if (TheMonstersDeck.CharacterList.ElementAt(i).Name.ToLower() == NameForIt.ToLower())
@@ -563,27 +571,60 @@ static List<Deck> CalculatingSpecificCharacterDEFPoints(List<Deck> AllDecks)
                 HasTheMonsterBeenFound = true;
             }
         }
-        Console.WriteLine();
-    }
-    CurrentCharacter.Name = NameForIt;
-
-    foreach (CharacterOrMonster monster in TheMonstersDeck.CharacterList)
-    {
-        if(monster.Name == CurrentCharacter.Name)
+        while (!HasTheMonsterBeenFound)
         {
-            CurrentCharacter = monster;
+            Console.WriteLine();
+            Console.WriteLine("This monster does not exist in this deck. Try another name:");
+            Console.WriteLine();
+            NameForIt = Console.ReadLine();
+            for (int i = 0; i < TheMonstersDeck.CharacterList.Count; i++)
+            {
+                if (TheMonstersDeck.CharacterList.ElementAt(i).Name.ToLower() == NameForIt.ToLower())
+                {
+                    HasTheMonsterBeenFound = true;
+                }
+            }
+            Console.WriteLine();
         }
-    }
+        CurrentCharacter.Name = NameForIt;
 
-    #endregion
+        foreach (CharacterOrMonster monster in TheMonstersDeck.CharacterList)
+        {
+            if (monster.Name == CurrentCharacter.Name)
+            {
+                CurrentCharacter = monster;
+            }
+        }
+
+        #endregion
+    }
+    else if(answer.ToLower() == "yes")
+    {
+        DoesTheUserWantsToApplyTheGapToAllCharacters = true;
+    }
 
     #region Entering the gap
 
     Console.Clear();
     Console.WriteLine("\x1b[3J");
 
-    Console.WriteLine(@$"Enter the gap (in multiplie power level terms) between {CurrentCharacter.Name}'s power level to the power it takes to one-shot (and kill) him/her.");
-    Console.WriteLine(@"How to do it: If it takes a power x1.5 strongest to kill the character, write 1.5. If x2, than write 2, etc.");
+    if (!DoesTheUserWantsToApplyTheGapToAllCharacters)
+    {
+        Console.WriteLine(@$"Enter the gap (in multiplier power level terms) between the character {CurrentCharacter.Name} power level to the power it takes to one-shot (and kill) it.");
+    }
+    else if(DoesTheUserWantsToApplyTheGapToAllCharacters)
+    {
+        Console.WriteLine(@$"Enter the gap (in multiplier power level terms) between all characters in the deck {TheMonstersDeck.DeckName} between their power level to the power it takes to one-shot (and kill) them.");
+    }
+    Console.WriteLine($@"How to do it: If it takes a power x1.5 strongest to kill the character/s, write 1.5. If x2, than write 2, etc.");
+    Console.WriteLine();
+    Console.WriteLine($@"(character/s means either a single character, or characters if you apply this to all monsters in the deck {TheMonstersDeck.DeckName}.");
+    Console.WriteLine();
+    Console.WriteLine($@"The character/s can't be killed with a power level not higher than his own. That's exgrated.");
+    Console.WriteLine($@"It's true was rated at 1500 while the special beam cannon that killed him was stated to be below that, but offical and stated numbers often make zero sense,");
+    Console.WriteLine($@"And raditz was likely only at 1000-1200 since he was slightly weakend by Gohan's attack. Possbily below 1000 if nerfing him to how strong he is actually shown to be.");
+    Console.WriteLine();
+    Console.WriteLine("So always put a number above 1:");
     Console.WriteLine();
     string gap = Console.ReadLine();
     while (!double.TryParse(gap, out double d))
@@ -615,23 +656,42 @@ static List<Deck> CalculatingSpecificCharacterDEFPoints(List<Deck> AllDecks)
 
     double convertingNumber = TheMonstersDeck.ThePowerConvertorBetweenPowerLevelToATKPoints;
     double YugiohDEFGap = Math.Pow(TheGap, convertingNumber);
-    double LogGap = (Math.Log(5000)) / Math.Log(YugiohDEFGap);
-    double DEFBonus = Math.Round(5000 / LogGap);
+    double LogGap = (Math.Log(TheMonstersDeck.TheHighestAllowedATKPoints)) / Math.Log(YugiohDEFGap);
+    double DEFBonus = Math.Round(TheMonstersDeck.TheHighestAllowedATKPoints / LogGap);
+    double DEFBonusForEveryOne = DEFBonus;
 
     #endregion
 
     #region Updating the DEF points on local variables
 
     AllDecks.Remove(TheMonstersDeck);
-    TheMonstersDeck.CharacterList.Find(x => x == CurrentCharacter).DEFPoints = CurrentCharacter.ATKPoints + DEFBonus; ;
-    CurrentCharacter.DEFPoints = CurrentCharacter.ATKPoints + DEFBonus;
+    if(!DoesTheUserWantsToApplyTheGapToAllCharacters)
+    {
+        TheMonstersDeck.CharacterList.Find(x => x == CurrentCharacter).DEFPoints = CurrentCharacter.ATKPoints + DEFBonus; ;
+        CurrentCharacter.DEFPoints = CurrentCharacter.ATKPoints + DEFBonus;
+    }
+    else if(DoesTheUserWantsToApplyTheGapToAllCharacters)
+    {
+        foreach(CharacterOrMonster monster in TheMonstersDeck.CharacterList)
+        {
+            monster.DEFPoints = monster.ATKPoints + DEFBonusForEveryOne;
+        }
+    }
+
     AllDecks.Add(TheMonstersDeck);
 
     #endregion
 
     #region Updating the DEF points in the deck xml file
 
-    UpdatingDEFPoints(CurrentCharacter, TheMonstersDeck);
+    if(!DoesTheUserWantsToApplyTheGapToAllCharacters)
+    {
+        UpdatingDEFPoints(TheMonstersDeck, CurrentCharacter);
+    }
+    else if(DoesTheUserWantsToApplyTheGapToAllCharacters)
+    {
+        UpdatingDEFPoints(TheMonstersDeck);
+    }
 
     #endregion
 
@@ -639,7 +699,14 @@ static List<Deck> CalculatingSpecificCharacterDEFPoints(List<Deck> AllDecks)
 
     Console.Clear();
     Console.WriteLine("\x1b[3J");
-    Console.WriteLine($@"{CurrentCharacter.Name} DEF points should be: {CurrentCharacter.ATKPoints + DEFBonus}.");
+    if(!DoesTheUserWantsToApplyTheGapToAllCharacters)
+    {
+        Console.WriteLine($@"{CurrentCharacter.Name} DEF points should be: {CurrentCharacter.ATKPoints + DEFBonus}.");
+    }
+    else if(DoesTheUserWantsToApplyTheGapToAllCharacters)
+    {
+        Console.WriteLine($@"All of the monsters in the deck named {TheMonstersDeck.DeckName}'s DEF points are {DEFBonus} higher than their Attack points.");
+    }
     Console.WriteLine(@$"And it's saved in the database.");
     Console.WriteLine("Enter anything to go back to the main meun.");
     Console.ReadLine();
@@ -650,6 +717,8 @@ static List<Deck> CalculatingSpecificCharacterDEFPoints(List<Deck> AllDecks)
 
     #endregion
 }
+
+#endregion
 
 #region Preparing all the deck and monsters objects pre-software start
 
@@ -862,7 +931,7 @@ static void UpdateDeckWithNewMonster(Deck deck, CharacterOrMonster monster)
 
 #region Updating a deck when an existing's monster DEF is set
 
-    static void UpdatingDEFPoints(CharacterOrMonster monster, Deck deck)
+    static void UpdatingDEFPoints(Deck deck, CharacterOrMonster monster = null)
     {
     XDocument DeckFileToEdit = new XDocument(XDocument.Load($@"YugiohDBZConverter\{deck.DeckName}.xml"));
     XElement root = DeckFileToEdit.Root;
@@ -884,9 +953,12 @@ static void UpdateDeckWithNewMonster(Deck deck, CharacterOrMonster monster)
         {
             ItsName = monsterElement.Element("Name");
         }
-        if (ItsName.Value.ToLower() == monster.Name.ToLower())
+        if (monster != null)
         {
-            monsterElement.Element("DEFPoints").Value = monster.DEFPoints.ToString();
+            if (ItsName.Value.ToLower() == monster.Name.ToLower())
+            {
+                monsterElement.Element("DEFPoints").Value = monster.DEFPoints.ToString();
+            }
         }
     }
     IEnumerable<XElement> RootOtherElements = root.Elements();
