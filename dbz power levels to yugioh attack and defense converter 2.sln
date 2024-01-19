@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34009.444
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dbz power levels to yugioh attack and defense converter 2", "dbz power levels to yugioh attack and defense converter 2.csproj", "{D7CCAF40-1AD4-49BE-AC92-38B5DB7B3895}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dbz power levels to yugioh attack and defense converter 2", "dbz power levels to yugioh attack and defense converter 2.csproj", "{D7CCAF40-1AD4-49BE-AC92-38B5DB7B3895}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YugiohDBZConverterTest2", "..\YugiohDBZConverterTest2\YugiohDBZConverterTest2.csproj", "{77000BB5-2212-4048-A4A3-F7344179F443}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{D7CCAF40-1AD4-49BE-AC92-38B5DB7B3895}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7CCAF40-1AD4-49BE-AC92-38B5DB7B3895}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D7CCAF40-1AD4-49BE-AC92-38B5DB7B3895}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77000BB5-2212-4048-A4A3-F7344179F443}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77000BB5-2212-4048-A4A3-F7344179F443}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77000BB5-2212-4048-A4A3-F7344179F443}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77000BB5-2212-4048-A4A3-F7344179F443}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
