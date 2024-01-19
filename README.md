@@ -3,7 +3,7 @@ It's a console app, working in a logic of input-output: the user inputs some var
 I only created this to make a Yugioh computer game where most monster cards are DBZ characters, which I have power levels for all of them.
 
 While this is obviously useless for benefical stuff, the basic mathematical idea behind this,
-which includes (according to chatGPT) scalling factors, exponents, use of power and logs, and base numbers, and (possibly) Set theory.
+which includes (according to chatGPT) scalling factors, exponents, use of power, Logarithms, base numbers and Set theory,
 may be usefull for other (benefical) mathematical calulcations not related to pointless nonesense such as games or anime.
 Such as finance stuff.
 
